@@ -5,19 +5,33 @@ app=Flask(__name__)
 @app.route('/')
 @app.route('/home')
 def home():
-    return ('home.html')
+    return render_template('home.html')
 
 @app.route('/input',methods=['GET','POST'])
 def input():
     if (request.method == "POST"):
-        return 0
+        wt=request.form["weight"]
+        ht=request.form["height"]
+        at=request.form["age"]
+        gt= str(request.form.get('gender'))
+        if "gender" in request.form:
+            gt = request.form["gender"]
+        else:
+            gt = 1
+        body_mass_index=bmi(wt,ht,at,gt)
+        basal_metabolic_rate=bmr(wt,ht,at,gt)
+        return render_template('output.html',BMI=body_mass_index[0],BMR=basal_metabolic_rate,SIZE=body_mass_index[1])
     else:
-        return 0
+        return render_template("input.html")
         
 
 @app.route('/output')
 def output():
-    return render_template('output.html',,)
+    if (request.method == "POST"):
+        return render_template('home.html')
+    else:
+        return("output.html")
+    
 
 
 
@@ -33,32 +47,34 @@ def bmr(wt,ht,at,gt):
 
     bmr = round(bmr)
     
-    return str(bmr)+"clories/day"
+    return bmr
 
-def bmr(wt,ht,at,gt):
+def bmi(wt,ht,at,gt):
     weight = float(wt)
     height = float(ht)
     age = int(at)
     gender=str(gt)
+    out=[]
     bmi=((weight)/(height**2))*1000
-    print(str(bmi)[:4])
+    out.append(str(bmi)[:4])
     bmi=bmi*10
     if(bmi<16):
-        print("Severe Thinness")
+        out.append("Severe Thinness")
     elif(bmi>=16 and  bmi<17):
-        print("Moderate Thinness")
+        out.append("Moderate Thinness")
     elif(bmi>=17 and  bmi<18.5):
-        print("Mild Thinness")
+        out.append("Mild Thinness")
     elif(bmi>=18.5 and bmi<25):
-        print("Normal")
+        out.append("Normal")
     elif(bmi>=25 and bmi<30): 
-        print("Overweight")
+        out.append("Overweight")
     elif(bmi>=30 and bmi<35):
-        print("Obese Class I")
+        out.append("Obese Class I")
     elif(bmi>=35 and bmi<40):
-        print("Obese Class II")
+        out.append("Obese Class II")
     elif(bmi>40):
-        print("Obese Class III")
+        out.append("Obese Class III")
+    return out
 
 def eye_patch():
     return 0
